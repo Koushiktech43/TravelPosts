@@ -4,6 +4,6 @@ import retrofit2.http.GET
 
 interface ApiService {
 
-    @GET("travel/top.json")
+    @GET("r/travel/top.json")
     suspend fun getPosts() : TravelPostDto
 }

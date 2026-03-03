@@ -29,6 +29,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            isDebuggable = true  // should be true by default
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
