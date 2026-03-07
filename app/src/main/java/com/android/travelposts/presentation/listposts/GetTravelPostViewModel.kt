@@ -34,42 +34,37 @@ class GetTravelPostViewModel @Inject constructor (
         loadPosts()
     }
 
-    private val posts : StateFlow<List<Children>> = _uiState.mapNotNull {
-        state -> (state as? UiState.Success)
-        ?.data
-        ?.data
-        ?.children
-    } .stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        emptyList()
-    )
 
-    val filteredList : StateFlow<List<Children>> = combine(
-        posts,_searchQuery
-    ){ posts , query ->
-         if(query.isBlank()){
-             posts
-         } else{
-             posts.filter { it.data.name.contains(query, ignoreCase = true) }
-         }
+    val posts : StateFlow<List<Children>> = _uiState.mapNotNull { state ->
+        (state as? UiState.Success)?.data?.data?.children
     }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        emptyList()
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        emptyList())
+
+    val filteredList : StateFlow<List<Children>> = combine(posts,_searchQuery){ list , query ->
+          if(query.isEmpty()){
+              list
+          } else {
+              list.filter { it.data.name.contains(query) }
+          }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
     )
 
-     fun loadPosts(){
+
+    fun updateSearchQuery(query : String) {
+        _searchQuery.value = query
+    }
+    fun loadPosts(){
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 _uiState.value =  UiState.Success(useCase.invoke())
             }
 
         }
-    }
-
-    fun updateSearchQuery(query : String){
-        _searchQuery.value = query
     }
 
 }

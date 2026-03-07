@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TravelPosts</string>
+    <string name="search_products">Search Products</string>
 </resources>
