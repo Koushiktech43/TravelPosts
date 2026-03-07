@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.android.travelposts.presentation.listposts.GetListPostScreen
-import com.android.travelposts.presentation.listposts.GetTravelPostViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.travelposts.presentation.getproducts.GetProductsListScreen
 import com.android.travelposts.ui.theme.TravelPostsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,8 +25,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             TravelPostsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RedditPosts(
-                        viewModel = hiltViewModel(),
+                    Greeting(
+                        name = "Android",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -36,14 +36,14 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun RedditPosts(viewModel: GetTravelPostViewModel, modifier: Modifier = Modifier) {
-    GetListPostScreen(viewModel)
+fun Greeting(name: String, modifier: Modifier = Modifier) {
+    GetProductsListScreen(viewModel = hiltViewModel())
 }
 
 @Preview(showBackground = true)
 @Composable
-fun RedditPostsPreview() {
-   /* TravelPostsTheme {
-        RedditPosts("Android")
-    }*/
+fun GreetingPreview() {
+    TravelPostsTheme {
+        Greeting("Android")
+    }
 }
