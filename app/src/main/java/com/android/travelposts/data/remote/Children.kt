@@ -13,6 +13,7 @@ data class ChildrenData(
     @SerialName("author_fullname")
     val authorFullName : String,
     val name : String,
-    val thumbnail : String
+    val thumbnail : String,
+    val url : String
 )
 
