@@ -13,8 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.android.travelposts.data.remote.ProductDTO
 import com.android.travelposts.presentation.getproducts.utils.UiState
 
@@ -28,7 +30,7 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel) {
         modifier = Modifier.fillMaxSize()
     ) {
         when(uiState) {
-            is UiState.Error -> TODO()
+            is UiState.Error -> Text(text = (uiState as UiState.Error).message)
             UiState.Loading -> Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -41,6 +43,11 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(16.dp)
                         ) {
+                            AsyncImage(
+                                model = list.image,
+                                contentDescription = list.title,
+                                contentScale = ContentScale.Crop
+                            )
                             Text(text = list.title)
                         }
                     }
