@@ -49,8 +49,6 @@ class GetProductsViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-
-
     init {
         loadProducts()
     }
@@ -63,5 +61,9 @@ class GetProductsViewModel @Inject constructor(
 
     fun updateSearch(query : String){
         this._searchQuery.value = query
+    }
+
+    fun getProductsById(id : Int) : ProductDTO? {
+        return productList.value.find { it.id==id }
     }
 }

@@ -1,5 +1,6 @@
 package com.android.travelposts.presentation.getproducts
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,11 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.android.travelposts.R
+import com.android.travelposts.data.remote.ProductDTO
 import com.android.travelposts.presentation.getproducts.utils.UiState
 
 
 @Composable
-fun GetProductsListScreen(viewModel: GetProductsViewModel) {
+fun GetProductsListScreen(viewModel: GetProductsViewModel, onProductClick : (ProductDTO) -> Unit) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val filteredList by viewModel.filteredList.collectAsStateWithLifecycle()
@@ -54,6 +56,7 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .clickable{onProductClick(list)}
                                 .padding(16.dp)
                         ) {
                             AsyncImage(
