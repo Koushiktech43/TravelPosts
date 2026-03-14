@@ -41,8 +41,9 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel, onProductIDClicked: (
     val categoryList by viewModel.categoryList.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
 
+
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(24.dp)
     ) {
         LaunchedEffect(
             Unit
