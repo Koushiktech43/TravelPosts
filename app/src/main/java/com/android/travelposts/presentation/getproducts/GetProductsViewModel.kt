@@ -27,6 +27,9 @@ class GetProductsViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow<String>("")
     val searchQuery : StateFlow<String> = _searchQuery.asStateFlow()
 
+
+
+
      val productList : StateFlow<List<ProductDTO>> = _uiState.mapNotNull { state ->
          (state as? UiState.Success)?.data
      }.stateIn(

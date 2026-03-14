@@ -41,7 +41,7 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel) {
             modifier = Modifier.padding(24.dp)
         )
         when(uiState) {
-            is UiState.Error -> Text(text = (uiState as UiState.Error).message)
+            is com.android.travelposts.presentation.getproducts.utils.UiState.Error -> Text(text = (uiState as com.android.travelposts.presentation.getproducts.utils.UiState.Error).message)
             UiState.Loading -> Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
