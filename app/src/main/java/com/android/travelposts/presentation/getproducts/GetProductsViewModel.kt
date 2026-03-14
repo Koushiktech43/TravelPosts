@@ -49,7 +49,7 @@ class GetProductsViewModel @Inject constructor(
       list.filter {
           ((it.category == category) || (category == "All")) &&
                   ((query.isEmpty()) || (it.title.contains(query, ignoreCase = true)))
-      }
+      }.sortedBy { it.price }
   }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
