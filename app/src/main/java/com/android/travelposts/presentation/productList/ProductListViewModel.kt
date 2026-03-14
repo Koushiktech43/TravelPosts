@@ -31,6 +31,9 @@ class ProductListViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
+    private val _selectedCategory = MutableStateFlow("All")
+    val selectedCategory = _selectedCategory.asStateFlow()
+
     val productList : StateFlow<List<Product>> = _uiState.mapNotNull { state->
         (state as? UiState.Success)?.data
     }.stateIn(
@@ -39,15 +42,27 @@ class ProductListViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
+    val categoryList : StateFlow<List<String>> = productList.mapNotNull {  products->
+        listOf("All") + products.map { it.category }.distinct()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = listOf("All")
+    )
+
     val filteredProductList : StateFlow<List<Product>> = combine(
-        productList,_searchQuery
-    ) { list , query ->
-        list.filter {  it.title.contains(query,ignoreCase = true) }
+        productList,_searchQuery, _selectedCategory
+    ) { list , query ,selectedCategory ->
+        list.filter { (selectedCategory == "All" || selectedCategory == it.category) && (it.title.contains(query,ignoreCase = true)) }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
+
+
+
     init {
         loadProducts()
     }
@@ -73,5 +88,9 @@ class ProductListViewModel @Inject constructor(
 
     fun setSearchQuery(query : String) {
         this._searchQuery.value = query
+    }
+
+    fun setSelectedCategory(category : String) {
+        this._selectedCategory.value = category
     }
 }
