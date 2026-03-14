@@ -35,7 +35,8 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel, onProductIDClicked: (
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val filteredList by viewModel.filteredList.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-
+    val categoryList by viewModel.categoryList.collectAsStateWithLifecycle()
+    val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -48,6 +49,19 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel, onProductIDClicked: (
             placeholder = {Text("Search")},
             modifier = Modifier.padding(24.dp)
         )
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) {
+            items(categoryList){ category ->
+                FilterChip(
+                    label = {Text(category)},
+                    selected = selectedCategory == category,
+                    onClick = {viewModel.setSelectedCategory(category)},
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
+        }
 
         when (uiState) {
             is UiState.Error -> Text(text = (uiState as UiState.Error).message)

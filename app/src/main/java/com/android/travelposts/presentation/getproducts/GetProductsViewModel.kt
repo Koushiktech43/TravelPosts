@@ -25,8 +25,11 @@ class GetProductsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UiState<List<ProductDTO>>>(UiState.Loading)
     val uiState: StateFlow<UiState<List<ProductDTO>>> = _uiState.asStateFlow()
 
-    private val _searchQuery = MutableStateFlow<String>("")
+    private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
+
+    private val _selectedCategory = MutableStateFlow("All")
+    val selectedCategory = _selectedCategory.asStateFlow()
 
 
     // Observing Success Product List
@@ -41,13 +44,25 @@ class GetProductsViewModel @Inject constructor(
 
   // Listening for search query and update filter
     val filteredList: StateFlow<List<ProductDTO>> = combine(
-        productList, _searchQuery
-    ) {  list, query->
-        list.filter { (list.isEmpty()) || (it.title.contains(query,ignoreCase = true)) }
-    }.stateIn(
+        productList, _searchQuery,_selectedCategory
+    ) { list, query, category ->
+      list.filter {
+          ((it.category == category) || (category == "All")) &&
+                  ((query.isEmpty()) || (it.title.contains(query, ignoreCase = true)))
+      }
+  }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
+    )
+
+    // Whenever product list changes Category list gets updated
+    val categoryList : StateFlow<List<String>> = productList.mapNotNull { products ->
+        listOf("All") +  products.map { it.category }.distinct()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(1000),
+        initialValue = listOf("All")
     )
 
 
@@ -62,8 +77,16 @@ class GetProductsViewModel @Inject constructor(
         }
     }
 
+    fun getProductByID(id : Int) : ProductDTO? {
+        return productList.value.find { it.id == id }
+    }
+
     fun setSearchQuery(query : String) {
         this._searchQuery.value = query
+    }
+
+    fun setSelectedCategory(category : String) {
+        _selectedCategory.value = category
     }
 
 

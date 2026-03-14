@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.travelposts.navigation.AppNavHost
 import com.android.travelposts.presentation.getproducts.GetProductsListScreen
 import com.android.travelposts.presentation.getproducts.GetProductsViewModel
 import com.android.travelposts.ui.theme.TravelPostsTheme
@@ -40,9 +41,7 @@ class MainActivity : ComponentActivity() {
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     //AppNavHost()
     val productsViewModel : GetProductsViewModel = hiltViewModel()
-    GetProductsListScreen(productsViewModel,{
-
-    })
+    AppNavHost()
 }
 
 @Preview(showBackground = true)
