@@ -35,35 +35,20 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel, onProductIDClicked: (
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val filteredList by viewModel.filteredList.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-    val categories by viewModel.categories.collectAsStateWithLifecycle()
-    val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
+
 
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = { viewModel.updateSearch(query = it) },
-            placeholder = { Text(stringResource(R.string.search_products)) },
+            onValueChange = {
+                viewModel.setSearchQuery(query = it)
+            },
+            placeholder = {Text("Search")},
             modifier = Modifier.padding(24.dp)
         )
-        /**
-         * Category Buttons
-         */
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            items(categories) { category ->
-                FilterChip(
-                    selected = selectedCategory == category,
-                    onClick = { viewModel.selectCategory(category) },
-                    label = { Text(category) },
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-            }
-        }
+
         when (uiState) {
             is UiState.Error -> Text(text = (uiState as UiState.Error).message)
             UiState.Loading -> Box(
@@ -75,8 +60,7 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel, onProductIDClicked: (
 
             is UiState.Success -> {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize()
+                  columns = GridCells.Fixed(2)
                 ) {
                     items(filteredList) { list ->
                         Column(

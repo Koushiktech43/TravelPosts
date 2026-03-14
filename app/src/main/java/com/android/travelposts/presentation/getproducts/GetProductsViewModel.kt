@@ -26,12 +26,10 @@ class GetProductsViewModel @Inject constructor(
     val uiState: StateFlow<UiState<List<ProductDTO>>> = _uiState.asStateFlow()
 
     private val _searchQuery = MutableStateFlow<String>("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
-
-    private val _selectedCategory = MutableStateFlow("All")
-    val selectedCategory: StateFlow<String> = _selectedCategory.asStateFlow()
+    val searchQuery = _searchQuery.asStateFlow()
 
 
+    // Observing Success Product List
     val productList: StateFlow<List<ProductDTO>> = _uiState.mapNotNull { state ->
         (state as? UiState.Success)?.data
     }.stateIn(
@@ -40,28 +38,18 @@ class GetProductsViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    val categories: StateFlow<List<String>> = productList.mapNotNull { products ->
-        listOf("All") + products.map { it.category }.distinct()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = listOf("All")
-    )
 
+  // Listening for search query and update filter
     val filteredList: StateFlow<List<ProductDTO>> = combine(
-        productList, _searchQuery, _selectedCategory
-    ) { products, query, category ->
-        products.filter { product ->
-            ((category == "All") || product.category == category) && (query.isEmpty() || product.title.contains(
-                query,
-                ignoreCase = true
-            ))
-        }
+        productList, _searchQuery
+    ) {  list, query->
+        list.filter { (list.isEmpty()) || (it.title.contains(query,ignoreCase = true)) }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
 
 
     init {
@@ -74,16 +62,9 @@ class GetProductsViewModel @Inject constructor(
         }
     }
 
-    fun updateSearch(query: String) {
+    fun setSearchQuery(query : String) {
         this._searchQuery.value = query
     }
 
-    fun getProductByID(id : Int) : ProductDTO? {
-        return productList.value.find { it.id == id }
-    }
 
-
-    fun selectCategory(category: String) {
-        _selectedCategory.value = category
-    }
 }
