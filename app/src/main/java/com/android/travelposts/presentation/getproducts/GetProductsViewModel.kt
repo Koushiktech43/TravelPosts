@@ -19,39 +19,48 @@ import javax.inject.Inject
 @HiltViewModel
 class GetProductsViewModel @Inject constructor(
     private val useCase: GetProductsUseCase
-) :  ViewModel() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState<List<ProductDTO>>>(UiState.Loading)
-    val uiState : StateFlow<UiState<List<ProductDTO>>> = _uiState.asStateFlow()
+    val uiState: StateFlow<UiState<List<ProductDTO>>> = _uiState.asStateFlow()
 
     private val _searchQuery = MutableStateFlow<String>("")
-    val searchQuery : StateFlow<String> = _searchQuery.asStateFlow()
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _selectedCategory = MutableStateFlow("All")
+    val selectedCategory: StateFlow<String> = _selectedCategory.asStateFlow()
 
 
-
-
-     val productList : StateFlow<List<ProductDTO>> = _uiState.mapNotNull { state ->
-         (state as? UiState.Success)?.data
-     }.stateIn(
-         scope = viewModelScope,
-         started = SharingStarted.WhileSubscribed(5000),
-         initialValue = emptyList()
-     )
-
-    val filteredList : StateFlow<List<ProductDTO>> = combine(
-        productList,_searchQuery
-    ) { product , query ->
-        if(query.isNotEmpty()){
-            product.filter { it.title.contains(query,ignoreCase = true) }
-        } else{
-            product
-        }
+    val productList: StateFlow<List<ProductDTO>> = _uiState.mapNotNull { state ->
+        (state as? UiState.Success)?.data
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
 
+    val categories: StateFlow<List<String>> = productList.mapNotNull { products ->
+        listOf("All") + products.map { it.category }.distinct()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = listOf("All")
+    )
+
+    val filteredList: StateFlow<List<ProductDTO>> = combine(
+        productList, _searchQuery, _selectedCategory
+    ) { products, query, category ->
+        products.filter { product ->
+            ((category == "All") || product.category == category) && (query.isEmpty() || product.title.contains(
+                query,
+                ignoreCase = true
+            ))
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
 
     init {
@@ -64,7 +73,12 @@ class GetProductsViewModel @Inject constructor(
         }
     }
 
-    fun updateSearch(query : String){
+    fun updateSearch(query: String) {
         this._searchQuery.value = query
+    }
+
+
+    fun selectCategory(category: String) {
+        _selectedCategory.value = category
     }
 }
