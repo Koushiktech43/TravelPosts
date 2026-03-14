@@ -11,11 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.travelposts.navigation.AppNavHost
-import com.android.travelposts.presentation.getproducts.GetProductsListScreen
-import com.android.travelposts.presentation.getproducts.GetProductsViewModel
+
 import com.android.travelposts.ui.theme.TravelPostsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,8 +36,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     //AppNavHost()
-    val productsViewModel : GetProductsViewModel = hiltViewModel()
-    AppNavHost()
+    //val productsViewModel : GetProductsViewModel = hiltViewModel()
+   // AppNavHost()
 }
 
 @Preview(showBackground = true)
