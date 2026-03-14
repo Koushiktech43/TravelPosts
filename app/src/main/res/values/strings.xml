@@ -2,4 +2,6 @@
     <string name="app_name">TravelPosts</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="search_products">Search Products</string>
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="cart_added">Cart Added</string>
 </resources>

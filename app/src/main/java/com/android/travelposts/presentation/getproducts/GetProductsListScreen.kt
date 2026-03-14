@@ -1,5 +1,6 @@
 package com.android.travelposts.presentation.getproducts
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +30,7 @@ import com.android.travelposts.presentation.getproducts.utils.UiState
 
 
 @Composable
-fun GetProductsListScreen(viewModel: GetProductsViewModel) {
+fun GetProductsListScreen(viewModel: GetProductsViewModel, onProductIDClicked: (Int) -> Unit) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val filteredList by viewModel.filteredList.collectAsStateWithLifecycle()
@@ -37,32 +38,33 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel) {
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
 
-
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = {viewModel.updateSearch(query = it)},
-            placeholder = {Text(stringResource(R.string.search_products))},
+            onValueChange = { viewModel.updateSearch(query = it) },
+            placeholder = { Text(stringResource(R.string.search_products)) },
             modifier = Modifier.padding(24.dp)
         )
         /**
          * Category Buttons
          */
         LazyRow(
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            items(categories){ category->
+            items(categories) { category ->
                 FilterChip(
                     selected = selectedCategory == category,
-                    onClick = {viewModel.selectCategory(category)},
-                    label = {Text(category)},
+                    onClick = { viewModel.selectCategory(category) },
+                    label = { Text(category) },
                     modifier = Modifier.padding(end = 8.dp)
                 )
             }
         }
-        when(uiState) {
+        when (uiState) {
             is UiState.Error -> Text(text = (uiState as UiState.Error).message)
             UiState.Loading -> Box(
                 modifier = Modifier.fillMaxSize(),
@@ -70,15 +72,17 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel) {
             ) {
                 CircularProgressIndicator()
             }
+
             is UiState.Success -> {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(filteredList){ list->
+                    items(filteredList) { list ->
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .clickable { onProductIDClicked(list.id) }
                                 .padding(16.dp)
                         ) {
                             AsyncImage(
@@ -93,5 +97,4 @@ fun GetProductsListScreen(viewModel: GetProductsViewModel) {
             }
         }
     }
-
 }

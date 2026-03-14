@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -75,6 +76,10 @@ class GetProductsViewModel @Inject constructor(
 
     fun updateSearch(query: String) {
         this._searchQuery.value = query
+    }
+
+    fun getProductByID(id : Int) : ProductDTO? {
+        return productList.value.find { it.id == id }
     }
 
 
