@@ -1,5 +1,6 @@
 package com.android.travelposts.presentation.productList
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +27,7 @@ import coil.compose.AsyncImage
 import com.android.travelposts.presentation.core.UiState
 
 @Composable
-fun  ProductListScreen(viewModel: ProductListViewModel) {
+fun ProductListScreen(viewModel: ProductListViewModel , onProductClicked : (Int) -> Unit) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -35,46 +36,55 @@ fun  ProductListScreen(viewModel: ProductListViewModel) {
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
     ) {
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = {viewModel.setSearchQuery(it)},
-            placeholder = {Text("Search..")}
+            onValueChange = { viewModel.setSearchQuery(it) },
+            placeholder = { Text("Search..") }
         )
         Row {
             LazyRow(
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
-                items(categoryList) { currentCategory->
+                items(categoryList) { currentCategory ->
                     FilterChip(
                         selected = currentCategory == selectedCategory,
-                        onClick = {viewModel.setSelectedCategory(currentCategory)},
-                        label = {Text(currentCategory)},
+                        onClick = { viewModel.setSelectedCategory(currentCategory) },
+                        label = { Text(currentCategory) },
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }
             }
         }
-        when(uiState) {
+        when (uiState) {
             is UiState.Error -> {
                 Text((uiState as UiState.Error).message)
             }
+
             is UiState.Loading -> {
                 Box(
-                   modifier = Modifier.fillMaxSize() ,
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }
             }
+
             is UiState.Success -> {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2)
                 ) {
-                    items(filteredProductList) { product->
+                    items(filteredProductList) { product ->
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onProductClicked(product.id)}
+                                .padding(8.dp)
                         ) {
                             AsyncImage(
                                 model = product.thumbnail,

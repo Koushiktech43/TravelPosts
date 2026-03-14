@@ -90,6 +90,10 @@ class ProductListViewModel @Inject constructor(
         this._searchQuery.value = query
     }
 
+    fun getProductDetailById(id : Int) : Product? {
+        return productList.value.find { it.id == id }
+    }
+
     fun setSelectedCategory(category : String) {
         this._selectedCategory.value = category
     }
