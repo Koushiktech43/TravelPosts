@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,10 +26,17 @@ import com.android.travelposts.presentation.core.UiState
 fun  ProductListScreen(viewModel: ProductListViewModel) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val filteredProductList by viewModel.filteredProductList.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp)
     ) {
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = {viewModel.setSearchQuery(it)},
+            placeholder = {Text("Search..")}
+        )
         when(uiState) {
             is UiState.Error -> {
                 Text((uiState as UiState.Error).message)
@@ -45,7 +53,7 @@ fun  ProductListScreen(viewModel: ProductListViewModel) {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2)
                 ) {
-                    items((uiState as UiState.Success<List<Product>>).data) { product->
+                    items(filteredProductList) { product->
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(8.dp)
                         ) {
