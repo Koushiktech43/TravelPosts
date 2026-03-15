@@ -2,7 +2,7 @@ package com.android.travelposts.presentation.productList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.travelposts.core.DispatcherProvider
 import com.android.travelposts.data.remote.GetProductAPIStatus
 import com.android.travelposts.data.remote.Product
 import com.android.travelposts.domain.GetProductUseCase
@@ -22,11 +22,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
-    private val useCase: GetProductUseCase
+    private val useCase: GetProductUseCase,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState<List<Product>>>(UiState.Loading)
-    val uiState :  StateFlow<UiState<List<Product>>> = _uiState.asStateFlow()
+    val uiState: StateFlow<UiState<List<Product>>> = _uiState.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
@@ -34,7 +35,7 @@ class ProductListViewModel @Inject constructor(
     private val _selectedCategory = MutableStateFlow("All")
     val selectedCategory = _selectedCategory.asStateFlow()
 
-    val productList : StateFlow<List<Product>> = _uiState.mapNotNull { state->
+    val productList: StateFlow<List<Product>> = _uiState.mapNotNull { state ->
         (state as? UiState.Success)?.data
     }.stateIn(
         scope = viewModelScope,
@@ -42,7 +43,7 @@ class ProductListViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    val categoryList : StateFlow<List<String>> = productList.mapNotNull {  products->
+    val categoryList: StateFlow<List<String>> = productList.mapNotNull { products ->
         listOf("All") + products.map { it.category }.distinct()
     }.stateIn(
         scope = viewModelScope,
@@ -50,17 +51,20 @@ class ProductListViewModel @Inject constructor(
         initialValue = listOf("All")
     )
 
-    val filteredProductList : StateFlow<List<Product>> = combine(
-        productList,_searchQuery, _selectedCategory
-    ) { list , query ,selectedCategory ->
-        list.filter { (selectedCategory == "All" || selectedCategory == it.category) && (it.title.contains(query,ignoreCase = true)) }
+    val filteredProductList: StateFlow<List<Product>> = combine(
+        productList, _searchQuery, _selectedCategory
+    ) { list, query, selectedCategory ->
+        list.filter {
+            (selectedCategory == "All" || selectedCategory == it.category) && (it.title.contains(
+                query,
+                ignoreCase = true
+            ))
+        }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
-
-
 
 
     init {
@@ -70,31 +74,30 @@ class ProductListViewModel @Inject constructor(
     fun loadProducts() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-           withContext(
-               Dispatchers.IO
-           ) {
-               val data = useCase.invoke()
-               withContext(Dispatchers.Main){
-                   when(data) {
-                       is GetProductAPIStatus.Error -> _uiState.value = UiState.Error(data.message)
-                       is GetProductAPIStatus.Success -> {
-                            _uiState.value = UiState.Success(data.data.products)
-                       }
-                   }
-               }
-           }
+            val data = withContext(
+                dispatcherProvider.io
+            ) {
+                useCase.invoke()
+            }
+            when (data) {
+                is GetProductAPIStatus.Error -> _uiState.value = UiState.Error(data.message)
+                is GetProductAPIStatus.Success -> {
+                    _uiState.value = UiState.Success(data.data.products)
+                }
+            }
         }
     }
 
-    fun setSearchQuery(query : String) {
+
+    fun setSearchQuery(query: String) {
         this._searchQuery.value = query
     }
 
-    fun getProductDetailById(id : Int) : Product? {
+    fun getProductDetailById(id: Int): Product? {
         return productList.value.find { it.id == id }
     }
 
-    fun setSelectedCategory(category : String) {
+    fun setSelectedCategory(category: String) {
         this._selectedCategory.value = category
     }
 }

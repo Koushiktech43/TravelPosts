@@ -2,7 +2,6 @@ package com.android.travelposts.data.repository
 
 import com.android.travelposts.data.ApiService
 import com.android.travelposts.data.remote.GetProductAPIStatus
-import com.android.travelposts.data.remote.ProductDTO
 import javax.inject.Inject
 
 class GetProductRepository @Inject constructor (
