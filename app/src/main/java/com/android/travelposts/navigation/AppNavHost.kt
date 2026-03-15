@@ -8,14 +8,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.android.travelposts.presentation.productList.ProductListScreen
-import com.android.travelposts.presentation.productList.ProductListViewModel
+import com.android.travelposts.presentation.productList.ProductViewModel
 import com.android.travelposts.presentation.productdetail.ProductDetail
 
 @Composable
 fun AppNavHost() {
 
     val navController = rememberNavController()
-    val viewModel : ProductListViewModel = hiltViewModel()
+    val viewModel : ProductViewModel = hiltViewModel()
 
     NavHost(navController = navController, startDestination = "list") {
         composable("list") {
@@ -30,10 +30,7 @@ fun AppNavHost() {
         )) { backStackEntry->
                val id = backStackEntry.arguments?.getInt("id")
                id?.let {
-                   val detail = viewModel.getProductDetailById(id)
-                   detail?.let {
-                       ProductDetail(detail)
-                   }
+                   ProductDetail(id,viewModel)
                }
         }
     }

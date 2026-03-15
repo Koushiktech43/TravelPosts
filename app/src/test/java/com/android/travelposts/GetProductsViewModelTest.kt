@@ -6,7 +6,7 @@ import com.android.travelposts.data.remote.Product
 import com.android.travelposts.data.remote.ProductDTO
 import com.android.travelposts.domain.GetProductUseCase
 import com.android.travelposts.presentation.core.UiState
-import com.android.travelposts.presentation.productList.ProductListViewModel
+import com.android.travelposts.presentation.productList.ProductViewModel
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -31,7 +31,7 @@ class GetProductsViewModelTest {
 
     private val useCase : GetProductUseCase = mockk()
 
-    private lateinit var viewModel: ProductListViewModel
+    private lateinit var viewModel: ProductViewModel
 
     private val dispatcher = StandardTestDispatcher()
 
@@ -55,7 +55,7 @@ class GetProductsViewModelTest {
         dispatcherProvider = mockk {
             every { io } returns dispatcher
         }
-        viewModel = ProductListViewModel(useCase,dispatcherProvider)
+        viewModel = ProductViewModel(useCase,dispatcherProvider)
         states = mutableListOf()
         job = Job()
         CoroutineScope(dispatcher + job).launch {

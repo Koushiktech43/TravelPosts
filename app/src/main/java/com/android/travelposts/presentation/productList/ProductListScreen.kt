@@ -27,7 +27,7 @@ import coil.compose.AsyncImage
 import com.android.travelposts.presentation.core.UiState
 
 @Composable
-fun ProductListScreen(viewModel: ProductListViewModel , onProductClicked : (Int) -> Unit) {
+fun ProductListScreen(viewModel: ProductViewModel, onProductClicked : (Int) -> Unit) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()

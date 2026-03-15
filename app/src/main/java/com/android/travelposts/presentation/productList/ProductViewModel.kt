@@ -8,7 +8,6 @@ import com.android.travelposts.data.remote.Product
 import com.android.travelposts.domain.GetProductUseCase
 import com.android.travelposts.presentation.core.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +20,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductListViewModel @Inject constructor(
+class ProductViewModel @Inject constructor(
     private val useCase: GetProductUseCase,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
@@ -66,6 +65,10 @@ class ProductListViewModel @Inject constructor(
         initialValue = emptyList()
     )
 
+   private val _productDetail  = MutableStateFlow<Product?>(null)
+   val productDetail : StateFlow<Product?> = _productDetail.asStateFlow()
+
+
 
     init {
         loadProducts()
@@ -93,8 +96,8 @@ class ProductListViewModel @Inject constructor(
         this._searchQuery.value = query
     }
 
-    fun getProductDetailById(id: Int): Product? {
-        return productList.value.find { it.id == id }
+    fun loadProductDetailByID(id: Int) {
+        _productDetail.value = productList.value.find { it.id == id }
     }
 
     fun setSelectedCategory(category: String) {
