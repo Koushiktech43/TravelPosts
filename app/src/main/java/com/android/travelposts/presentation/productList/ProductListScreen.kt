@@ -36,37 +36,32 @@ fun ProductListScreen(viewModel: ProductViewModel, onProductClicked : (Int) -> U
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
+        modifier = Modifier.fillMaxSize().padding(24.dp)
     ) {
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { viewModel.setSearchQuery(it) },
-            placeholder = { Text("Search..") }
+            placeholder = { Text("Search") },
+            modifier = Modifier.padding(16.dp)
         )
-        Row {
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                items(categoryList) { currentCategory ->
-                    FilterChip(
-                        selected = currentCategory == selectedCategory,
-                        onClick = { viewModel.setSelectedCategory(currentCategory) },
-                        label = { Text(currentCategory) },
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                }
-            }
-        }
-        when (uiState) {
-            is UiState.Error -> {
-                Text((uiState as UiState.Error).message)
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth().padding(24.dp)
+        ) {
+            items(categoryList) { category ->
+                FilterChip(
+                    selected = selectedCategory == category,
+                    onClick = { viewModel.setSelectedCategory(category) },
+                    label = { Text(category) },
+                    modifier = Modifier.padding(end = 8.dp)
+                )
             }
 
-            is UiState.Loading -> {
+        }
+
+        when (uiState) {
+            is UiState.Error -> Text((uiState as UiState.Error).message)
+            UiState.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -83,7 +78,7 @@ fun ProductListScreen(viewModel: ProductViewModel, onProductClicked : (Int) -> U
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onProductClicked(product.id)}
+                                .clickable { onProductClicked(product.id) }
                                 .padding(8.dp)
                         ) {
                             AsyncImage(

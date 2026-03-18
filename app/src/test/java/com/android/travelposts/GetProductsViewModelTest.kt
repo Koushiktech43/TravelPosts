@@ -33,13 +33,15 @@ class GetProductsViewModelTest {
 
     private lateinit var viewModel: ProductViewModel
 
-    private val dispatcher = StandardTestDispatcher()
-
-    private lateinit var states : MutableList<UiState<List<Product>>>
-
-    private lateinit var dispatcherProvider: DispatcherProvider
+   private val dispatcher = StandardTestDispatcher()
 
     private lateinit var job : Job
+
+    private var states = mutableListOf<UiState<List<Product>>>()
+
+    private lateinit var dispatcherProvider : DispatcherProvider
+
+
 
 
     private val sampleProducts = listOf(
@@ -50,19 +52,20 @@ class GetProductsViewModelTest {
 
     @Before
     fun setUp() {
-
         Dispatchers.setMain(dispatcher)
         dispatcherProvider = mockk {
             every { io } returns dispatcher
         }
+
+
         viewModel = ProductViewModel(useCase,dispatcherProvider)
-        states = mutableListOf()
         job = Job()
         CoroutineScope(dispatcher + job).launch {
             viewModel.uiState.collect {
                 states.add(it)
             }
         }
+
 
     }
 

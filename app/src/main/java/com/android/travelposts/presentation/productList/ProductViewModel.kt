@@ -51,13 +51,17 @@ class ProductViewModel @Inject constructor(
     )
 
     val filteredProductList: StateFlow<List<Product>> = combine(
-        productList, _searchQuery, _selectedCategory
-    ) { list, query, selectedCategory ->
-        list.filter {
-            (selectedCategory == "All" || selectedCategory == it.category) && (it.title.contains(
-                query,
-                ignoreCase = true
-            ))
+        productList,_searchQuery,_selectedCategory
+    ) { list,query,selectedCategory->
+        list.filter { product->
+            val matchesCategory =
+                selectedCategory == "All" || product.category == selectedCategory
+
+            val matchesSearch =
+                product.title.contains(query, ignoreCase = true)
+
+            matchesCategory && matchesSearch
+
         }
     }.stateIn(
         scope = viewModelScope,
