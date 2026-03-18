@@ -11,13 +11,19 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -34,6 +40,28 @@ fun ProductListScreen(viewModel: ProductViewModel, onProductClicked : (Int) -> U
     val filteredProductList by viewModel.filteredProductList.collectAsStateWithLifecycle()
     val categoryList by viewModel.categoryList.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.selectedCategory.collectAsStateWithLifecycle()
+
+
+    val listState = rememberLazyGridState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val layoutInfo = listState.layoutInfo
+            val totalItems = layoutInfo.totalItemsCount
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            Pair(lastVisible, totalItems)
+        }.collect { (lastVisible, totalItems) ->
+            if (
+                totalItems > 0 &&
+                lastVisible >= totalItems - 4 &&
+                !viewModel.isLoading &&
+                viewModel.hasMore
+            ) {
+                viewModel.loadProducts()
+            }
+        }
+    }
+
 
     Column(
         modifier = Modifier
@@ -77,6 +105,7 @@ fun ProductListScreen(viewModel: ProductViewModel, onProductClicked : (Int) -> U
 
             is UiState.Success -> {
                 LazyVerticalGrid(
+                    state = listState,
                     columns = GridCells.Fixed(2)
                 ) {
                     items(filteredProductList) { product ->
@@ -92,6 +121,13 @@ fun ProductListScreen(viewModel: ProductViewModel, onProductClicked : (Int) -> U
                                 contentScale = ContentScale.Crop
                             )
                             Text(text = product.title)
+                        }
+                    }
+                    if(viewModel.isLoading){
+                        item{
+                            CircularProgressIndicator(
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                     }
                 }

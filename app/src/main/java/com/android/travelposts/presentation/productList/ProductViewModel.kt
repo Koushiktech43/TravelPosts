@@ -1,5 +1,8 @@
 package com.android.travelposts.presentation.productList
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.travelposts.core.DispatcherProvider
@@ -68,6 +71,17 @@ class ProductViewModel @Inject constructor(
    private val _productDetail  = MutableStateFlow<Product?>(null)
    val productDetail : StateFlow<Product?> = _productDetail.asStateFlow()
 
+    private val limit = 10
+    private var skip = 0
+
+    var isLoading by mutableStateOf(false)
+        private set
+    var hasMore = true
+        private set
+
+    var currentList = mutableListOf<Product>()
+
+
 
 
     init {
@@ -75,19 +89,33 @@ class ProductViewModel @Inject constructor(
     }
 
     fun loadProducts() {
+        if (isLoading || !hasMore) return // guard here
         viewModelScope.launch {
+
+
             _uiState.value = UiState.Loading
+            isLoading = true
             val data = withContext(
                 dispatcherProvider.io
             ) {
-                useCase.invoke()
+                useCase.invoke(limit,skip)
             }
             when (data) {
                 is GetProductAPIStatus.Error -> _uiState.value = UiState.Error(data.message)
                 is GetProductAPIStatus.Success -> {
-                    _uiState.value = UiState.Success(data.data.products)
+                    val newList = data.data.products
+                    currentList.addAll(newList)
+
+                    skip+= limit
+
+                    if(currentList.size >= data.data.total){
+                        hasMore = false
+                    }
+                    _uiState.value = UiState.Success(currentList)
+
                 }
             }
+            isLoading = false
         }
     }
 

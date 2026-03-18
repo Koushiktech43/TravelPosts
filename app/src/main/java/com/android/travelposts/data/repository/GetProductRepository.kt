@@ -7,9 +7,9 @@ import javax.inject.Inject
 class GetProductRepository @Inject constructor (
     private val apiService: ApiService
 ) {
-    suspend fun invoke() : GetProductAPIStatus {
+    suspend fun invoke(limit : Int ,skip : Int) : GetProductAPIStatus {
       return  try {
-          GetProductAPIStatus.Success(apiService.getProducts() )
+          GetProductAPIStatus.Success(apiService.getProducts(limit,skip) )
         } catch (e: Exception) {
             e.printStackTrace()
           GetProductAPIStatus.Error(e.message.toString())

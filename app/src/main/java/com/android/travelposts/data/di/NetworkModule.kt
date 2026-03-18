@@ -16,7 +16,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideApiService() : ApiService {
-        return Retrofit.Builder().baseUrl("https://dummyjson.com/products/").addConverterFactory(
+        return Retrofit.Builder().baseUrl("https://dummyjson.com/").addConverterFactory(
             GsonConverterFactory.create()).build().create(ApiService::class.java)
     }
 }

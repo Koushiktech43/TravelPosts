@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetProductUseCase @Inject constructor(
    private val repository: GetProductRepository
 ) {
-    suspend fun invoke() : GetProductAPIStatus {
-        return repository.invoke()
+    suspend fun invoke(limit: Int , skip : Int ) : GetProductAPIStatus {
+        return repository.invoke(limit,skip)
     }
 }

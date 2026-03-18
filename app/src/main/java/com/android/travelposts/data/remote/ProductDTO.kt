@@ -1,7 +1,10 @@
 package com.android.travelposts.data.remote
 
 data class ProductDTO(
-    val products : List<Product>
+    val products : List<Product>,
+    val total : Int ,
+    val skip : Int ,
+    val limit : Int
 )
 
 data class Product(
